@@ -3,8 +3,9 @@ from datetime import datetime, timezone
 from typing import List, Type
 
 import requests
-from crewai_tools.tools.base_tool import BaseTool
-from pydantic.v1 import BaseModel, Field
+from crewai.tools import BaseTool
+# from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 
 
 class FetchLatestVideosFromYouTubeChannelInput(BaseModel):

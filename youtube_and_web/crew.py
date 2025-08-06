@@ -3,7 +3,7 @@ from typing import List, Optional
 from crewai import Agent, Crew, Process, Task
 from crewai_tools import FirecrawlSearchTool, RagTool
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 from tools.AddVideoToVectorDBTool import AddVideoToVectorDBTool
 from tools.FetchLatestVideosFromYouTubeChannelTool import (
@@ -51,7 +51,23 @@ class ContentCreatorInfo(BaseModel):
 fetch_latest_videos_tool = FetchLatestVideosFromYouTubeChannelTool()
 add_video_to_vector_db_tool = AddVideoToVectorDBTool()
 fire_crawl_search_tool = FirecrawlSearchTool()
-rag_tool = RagTool()
+rag_tool = RagTool(
+    config=dict(
+        llm=dict(
+            provider="google",
+            config=dict(
+                model="gemini-2.0-flash",
+            )
+        ),
+        embedder=dict(
+            provider="google",
+            config=dict(
+                model="models/embedding-001",
+                task_type="retrieval_document"
+            )
+        )
+    )
+)
 
 # --- Agents ---
 scrape_agent = Agent(
@@ -69,7 +85,7 @@ scrape_agent = Agent(
         """
     ),
     tools=[fetch_latest_videos_tool],
-    llm=ChatOpenAI(model="gpt-4o"),
+    llm="gemini/gemini-2.0-flash",
 )
 
 vector_db_agent = Agent(
@@ -84,7 +100,7 @@ vector_db_agent = Agent(
         """
     ),
     tools=[add_video_to_vector_db_tool],
-    llm=ChatOpenAI(model="gpt-4o"),
+    llm="gemini/gemini-2.0-flash",
 )
 
 general_research_agent = Agent(
@@ -104,7 +120,7 @@ general_research_agent = Agent(
         """
     ),
     tools=[rag_tool],
-    llm=ChatOpenAI(model="gpt-4o"),
+    llm="gemini/gemini-2.0-flash",
 )
 
 follow_up_agent = Agent(
@@ -123,7 +139,7 @@ follow_up_agent = Agent(
         """
     ),
     tools=[rag_tool],
-    llm=ChatOpenAI(model="gpt-4o"),
+    llm="gemini/gemini-2.0-flash",
 )
 
 fallback_agent = Agent(
@@ -139,7 +155,7 @@ fallback_agent = Agent(
         """
     ),
     tools=[fire_crawl_search_tool],
-    llm=ChatOpenAI(model="gpt-4o"),
+    llm="gemini/gemini-2.0-flash",
 )
 
 # --- Tasks ---
@@ -300,7 +316,7 @@ result = crew.kickoff(inputs={"youtube_channel_handle": youtube_channel_handle})
 print(result)
 
 # REPLAY EXAMPLE
-# result = crew.replay_from_task(
-#     "4a1e646f-3450-4300-b735-83ed448fea20",
+# result = crew.replay(
+#     "1031284d-2b42-40e6-a732-e62ad429c470",
 # )
 # print(result)

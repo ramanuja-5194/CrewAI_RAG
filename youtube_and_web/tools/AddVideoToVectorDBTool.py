@@ -1,10 +1,11 @@
 from typing import Type
 
-from crewai_tools.tools.base_tool import BaseTool
+from crewai.tools import BaseTool
 from dotenv import load_dotenv
 from embedchain import App
 from embedchain.models.data_type import DataType
-from pydantic.v1 import BaseModel, Field
+# from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 
 load_dotenv()
 
